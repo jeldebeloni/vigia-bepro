@@ -1,0 +1,28 @@
+name: Registrar número do WhatsApp
+
+# Rodar uma vez quando a Meta responder "Account not registered" (#133010).
+# O PIN de 6 dígitos é aleatório e não fica guardado; se precisar dele,
+# desligue a verificação em duas etapas no Gerenciador do WhatsApp e registre de novo.
+on:
+  workflow_dispatch:
+
+jobs:
+  registrar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Registrar o número na API do WhatsApp
+        env:
+          WHATSAPP_TOKEN: ${{ secrets.WHATSAPP_TOKEN }}
+          WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
+        run: |
+          node --input-type=module -e "
+            const pin = String(Math.floor(100000 + Math.random() * 900000));
+            const r = await fetch('https://graph.facebook.com/v25.0/' + process.env.WHATSAPP_PHONE_ID + '/register', {
+              method: 'POST',
+              headers: { authorization: 'Bearer ' + process.env.WHATSAPP_TOKEN, 'content-type': 'application/json' },
+              body: JSON.stringify({ messaging_product: 'whatsapp', pin }),
+            });
+            console.log('Meta respondeu', r.status, await r.text());
+            if (!r.ok) process.exit(1);
+          "

@@ -8,6 +8,7 @@ export async function enviarWhatsApp([titulo, detalhe], env = process.env) {
   if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_ID || !WHATSAPP_DESTINO) {
     throw new Error('faltam as chaves do WhatsApp no cofre do GitHub');
   }
+  const modelo = env.WHATSAPP_MODELO || 'aviso_vigia';
   const limpar = (t) => t.replace(/\s+/g, ' ').trim().slice(0, 900); // a Meta recusa quebra de linha em variável
   const r = await fetch(
     `https://graph.facebook.com/${env.WHATSAPP_API_VERSAO || 'v25.0'}/${WHATSAPP_PHONE_ID}/messages`,
@@ -18,8 +19,10 @@ export async function enviarWhatsApp([titulo, detalhe], env = process.env) {
         messaging_product: 'whatsapp',
         to: WHATSAPP_DESTINO,
         type: 'template',
-        template: {
-          name: env.WHATSAPP_MODELO || 'aviso_vigia',
+        template: modelo === 'hello_world'
+          ? { name: 'hello_world', language: { code: 'en_US' } } // modelo pronto da Meta, só para teste
+          : {
+          name: modelo,
           language: { code: 'pt_BR' },
           components: [
             {

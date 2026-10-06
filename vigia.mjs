@@ -20,6 +20,16 @@ const MAX_TENTATIVAS_ENVIO = 3;
 const env = process.env;
 const agora = Date.now();
 
+// Rodada manual de teste: só manda uma mensagem e sai.
+if (env.TESTE === '1') {
+  await enviarWhatsApp([
+    '🧪 Teste',
+    `Se você recebeu esta mensagem, os avisos de emergência estão funcionando. Enviado às ${hora(agora)}.`,
+  ]);
+  console.log('Mensagem de teste enviada.');
+  process.exit(0);
+}
+
 const estado = await lerEstado();
 estado.sites ??= {};
 estado.pendentes ??= [];

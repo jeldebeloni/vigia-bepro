@@ -1,0 +1,66 @@
+[
+  {
+    "id": "loja",
+    "nome": "Loja BePro (usebepro.com.br)",
+    "url": "https://usebepro.com.br/",
+    "contem": "<title>BePro",
+    "fornecedor": "nuvemshop"
+  },
+  {
+    "id": "site",
+    "nome": "Site jeldebeloni.com.br",
+    "url": "https://www.jeldebeloni.com.br/",
+    "contem": "Jelde Beloni",
+    "fornecedor": "vercel",
+    "vercel": "jelde-platform"
+  },
+  {
+    "id": "manychato",
+    "nome": "Manychato",
+    "url": "https://manychato.jeldebeloni.com.br/",
+    "contem": "Jelde DM Automation",
+    "fornecedor": "vercel",
+    "vercel": "manychato-jelde"
+  },
+  {
+    "id": "termos",
+    "nome": "BeloniStore Termos",
+    "url": "https://belonistore-termos.vercel.app/login",
+    "contem": "BeloniStore Termos",
+    "fornecedor": "vercel",
+    "vercel": "belonistore-termos"
+  },
+  {
+    "id": "precificacao",
+    "nome": "Precificação da loja",
+    "url": "https://precificacao-loja.vercel.app/",
+    "contem": "Precifica",
+    "fornecedor": "vercel",
+    "vercel": "precificacao-loja"
+  },
+  {
+    "id": "seminovos",
+    "nome": "BeloniStore Seminovos",
+    "url": "https://belonistore-seminovos.vercel.app/login",
+    "contem": "BeloniStore Seminovos",
+    "fornecedor": "vercel",
+    "vercel": "belonistore-seminovos"
+  },
+  {
+    "id": "catalogo",
+    "nome": "Feed do catálogo Meta",
+    "url": "https://bepro-catalogo-meta.vercel.app/feed.csv",
+    "metodo": "HEAD",
+    "tamanhoMinimo": 5000000,
+    "timeoutSeg": 40,
+    "fornecedor": "vercel",
+    "vercel": "bepro-catalogo-meta"
+  },
+  {
+    "id": "banco",
+    "nome": "Banco de dados (Supabase)",
+    "url": "https://aoaunkintfeoqycntneu.supabase.co/auth/v1/health",
+    "status": [200, 401],
+    "fornecedor": "supabase"
+  }
+]

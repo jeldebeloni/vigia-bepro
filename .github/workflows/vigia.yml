@@ -1,0 +1,44 @@
+name: Vigia
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vigia
+  cancel-in-progress: false
+
+jobs:
+  vigiar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Conferir plataformas
+        run: node vigia.mjs
+        env:
+          WHATSAPP_TOKEN: ${{ secrets.WHATSAPP_TOKEN }}
+          WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
+          WHATSAPP_DESTINO: ${{ secrets.WHATSAPP_DESTINO }}
+          WHATSAPP_MODELO: ${{ vars.WHATSAPP_MODELO }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
+
+      - name: Guardar estado
+        if: always()
+        run: |
+          git diff --quiet estado.json && exit 0
+          git config user.name 'vigia-bepro'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Atualiza estado do vigia' estado.json
+          git pull --rebase --quiet
+          git push --quiet

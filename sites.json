@@ -58,9 +58,22 @@
   },
   {
     "id": "banco",
-    "nome": "Banco de dados (Supabase)",
+    "nome": "Banco do site, Termos, Precificação e Seminovos (Supabase)",
     "url": "https://aoaunkintfeoqycntneu.supabase.co/auth/v1/health",
-    "status": [200, 401],
+    "status": [
+      200,
+      401
+    ],
+    "fornecedor": "supabase"
+  },
+  {
+    "id": "banco-manychato",
+    "nome": "Banco do Manychato (Supabase)",
+    "url": "https://iqhobzrffdmkmogywzbh.supabase.co/auth/v1/health",
+    "status": [
+      200,
+      401
+    ],
     "fornecedor": "supabase"
   }
 ]

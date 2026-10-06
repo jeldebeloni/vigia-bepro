@@ -3,7 +3,7 @@
 // Rodado à mão pelo GitHub (Actions > Voltar versão), nunca sozinho.
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-import { enviarWhatsApp } from './whatsapp.mjs';
+import { enviarAviso } from './avisos.mjs';
 
 const { VERCEL_TOKEN, VERCEL_TEAM_ID, VERCEL_TIME = 'jelde-centralizador', PLATAFORMA, ACAO } = process.env;
 if (!VERCEL_TOKEN) throw new Error('Falta a chave da Vercel (VERCEL_TOKEN) no cofre do GitHub.');
@@ -42,11 +42,11 @@ if (r.status !== 0) throw new Error(`A Vercel recusou o ${comando}.`);
 const quando = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
 }).format(alvo.created);
-await enviarWhatsApp(
+await enviarAviso(
   desfazer
     ? [`↪️ Volta desfeita: ${site.nome}`, `A versão mais nova (de ${quando}) está no ar de novo e as próximas publicações voltam a entrar sozinhas.`]
     : [`↩️ Versão voltada: ${site.nome}`, `Está no ar a versão de ${quando}. Enquanto a volta não for desfeita, publicações novas NÃO entram no ar sozinhas.`],
-).catch((e) => console.error('Aviso no WhatsApp não saiu:', e.message));
+).catch((e) => console.error('Aviso não saiu:', e.message));
 
 async function vercelApi(caminho) {
   const r = await fetch(`https://api.vercel.com${caminho}`, {

@@ -1,7 +1,7 @@
-// Vigia BePro: confere se cada plataforma está no ar e avisa pelo WhatsApp
+// Vigia BePro: confere se cada plataforma está no ar e avisa no Telegram e no WhatsApp
 // quando alguma cai ou volta. Roda no GitHub Actions a cada 5 minutos.
 import { readFile, writeFile } from 'node:fs/promises';
-import { enviarWhatsApp } from './whatsapp.mjs';
+import { enviarAviso, canaisConfigurados } from './avisos.mjs';
 
 const SITES = JSON.parse(await readFile(new URL('./sites.json', import.meta.url), 'utf8'));
 const ARQ_ESTADO = new URL('./estado.json', import.meta.url);
@@ -22,7 +22,7 @@ const agora = Date.now();
 
 // Rodada manual de teste: só manda uma mensagem e sai.
 if (env.TESTE === '1') {
-  await enviarWhatsApp([
+  await enviarAviso([
     '🧪 Teste',
     `Se você recebeu esta mensagem, os avisos de emergência estão funcionando. Enviado às ${hora(agora)}.`,
   ]);
@@ -105,16 +105,16 @@ if (horaBrasilia(agora) >= HORA_BOM_DIA && estado.bomDia !== hoje) {
 const fila = [...estado.pendentes, ...mensagens.map((m) => ({ m, tentativas: 0 }))];
 estado.pendentes = [];
 let falhou = false;
-const configurado = env.SIMULAR === '1' || env.WHATSAPP_TOKEN;
+const configurado = env.SIMULAR === '1' || canaisConfigurados(env).length > 0;
 if (!configurado) {
-  // Durante a montagem: sem WhatsApp, só a queda real vira e-mail do GitHub.
-  for (const item of fila) console.warn('WhatsApp ainda não configurado. Não enviado:', item.m.join(' — '));
+  // Durante a montagem: sem canal de aviso, só a queda real vira e-mail do GitHub.
+  for (const item of fila) console.warn('Nenhum canal de aviso configurado. Não enviado:', item.m.join(' — '));
   falhou = caiu.length > 0;
   fila.length = 0;
 }
 for (const item of fila) {
   try {
-    await enviarWhatsApp(item.m);
+    await enviarAviso(item.m);
     console.log('Enviado:', item.m.join(' — '));
   } catch (e) {
     item.tentativas += 1;
@@ -128,7 +128,7 @@ for (const [site, r] of resultados) console.log(`${r.ok ? 'OK  ' : 'FORA'} ${sit
 
 await writeFile(ARQ_ESTADO, JSON.stringify(estado, null, 2) + '\n');
 
-// Falhar a rodada faz o GitHub mandar e-mail: é o aviso reserva se o WhatsApp não sair.
+// Falhar a rodada faz o GitHub mandar e-mail: é o aviso reserva se nenhum canal entregar.
 if (falhou) process.exitCode = 1;
 
 // ---------------------------------------------------------------------------

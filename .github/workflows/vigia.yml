@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       teste:
-        description: Só mandar uma mensagem de teste no WhatsApp
+        description: Só mandar uma mensagem de teste (Telegram e WhatsApp)
         type: boolean
         default: false
       modelo:
@@ -35,6 +35,8 @@ jobs:
       - name: Conferir plataformas
         run: node vigia.mjs
         env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           WHATSAPP_TOKEN: ${{ secrets.WHATSAPP_TOKEN }}
           WHATSAPP_PHONE_ID: ${{ secrets.WHATSAPP_PHONE_ID }}
           WHATSAPP_DESTINO: ${{ secrets.WHATSAPP_DESTINO }}

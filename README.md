@@ -1,6 +1,6 @@
 # Vigia BePro
 
-Confere a cada 5 minutos se as plataformas estão no ar e avisa no WhatsApp quando alguma cai ou volta.
+Confere a cada 5 minutos se as plataformas estão no ar e avisa no Telegram (e no WhatsApp, enquanto o número de teste valer) quando alguma cai ou volta.
 
 ## O que ele faz
 
@@ -9,7 +9,7 @@ Confere a cada 5 minutos se as plataformas estão no ar e avisa no WhatsApp quan
 - **Diz de quem é a culpa:** lê a página de status da Vercel, do Supabase ou da Nuvemshop. Também diz quando foi a última publicação.
 - **Avisa só o que mudou:** quando cai, quando volta e um lembrete a cada 3 h se continuar fora.
 - **Bom dia diário:** às 8 h manda "Vigia ativo". Se essa mensagem não chegar, o vigia parou.
-- **E-mail reserva:** se o WhatsApp não sair, a rodada falha e o GitHub manda e-mail.
+- **Dois canais + e-mail reserva:** basta o Telegram ou o WhatsApp entregar. Se os dois falharem, a rodada falha e o GitHub manda e-mail.
 
 ## Botão de voltar versão
 
@@ -24,6 +24,8 @@ Serve só para as plataformas da Vercel. Não resolve quando a culpa é do forne
 
 | Nome | Tipo | O que é |
 |---|---|---|
+| `TELEGRAM_TOKEN` | segredo | Token do bot criado no @BotFather |
+| `TELEGRAM_CHAT_ID` | segredo | ID da conversa do Jelde com o bot (o @userinfobot mostra) |
 | `WHATSAPP_TOKEN` | segredo | Token permanente do usuário do sistema da Meta com permissão de WhatsApp |
 | `WHATSAPP_PHONE_ID` | segredo | ID do número que envia (número de teste da Meta) |
 | `WHATSAPP_DESTINO` | segredo | Número que recebe, só dígitos com 55 e DDD |

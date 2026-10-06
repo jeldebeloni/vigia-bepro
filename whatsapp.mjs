@@ -1,9 +1,5 @@
 // Envia um aviso pelo modelo de mensagem "aviso_vigia" (título + detalhe).
 export async function enviarWhatsApp([titulo, detalhe], env = process.env) {
-  if (env.SIMULAR === '1') {
-    console.log('[simulação]', titulo, '—', detalhe);
-    return;
-  }
   const { WHATSAPP_TOKEN, WHATSAPP_PHONE_ID, WHATSAPP_DESTINO } = env;
   if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_ID || !WHATSAPP_DESTINO) {
     throw new Error('faltam as chaves do WhatsApp no cofre do GitHub');

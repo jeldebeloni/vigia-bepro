@@ -31,14 +31,6 @@
     "vercel": "belonistore-termos"
   },
   {
-    "id": "precificacao",
-    "nome": "Precificação da loja",
-    "url": "https://precificacao-loja.vercel.app/",
-    "contem": "Precifica",
-    "fornecedor": "vercel",
-    "vercel": "precificacao-loja"
-  },
-  {
     "id": "seminovos",
     "nome": "BeloniStore Seminovos",
     "url": "https://belonistore-seminovos.vercel.app/login",
@@ -58,7 +50,7 @@
   },
   {
     "id": "banco",
-    "nome": "Banco do site, Termos, Precificação e Seminovos (Supabase)",
+    "nome": "Banco do site, Termos e Seminovos (Supabase)",
     "url": "https://aoaunkintfeoqycntneu.supabase.co/auth/v1/health",
     "status": [
       200,

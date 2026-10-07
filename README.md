@@ -4,7 +4,7 @@ Confere a cada 5 minutos se as plataformas estão no ar e avisa no Telegram (e n
 
 ## O que ele faz
 
-- **Confere 9 pontos:** loja BePro, site jeldebeloni.com.br, Manychato, Termos, Precificação, Seminovos, feed do catálogo Meta e os dois bancos (Supabase). A lista fica em `sites.json`.
+- **Confere 8 pontos:** loja BePro, site jeldebeloni.com.br, Manychato, Termos, Seminovos, feed do catálogo Meta e os dois bancos (Supabase). A lista fica em `sites.json`.
 - **Confirma antes de avisar:** só avisa se a queda se repetir 30 segundos depois.
 - **Diz de quem é a culpa:** lê a página de status da Vercel, do Supabase ou da Nuvemshop. Também diz quando foi a última publicação.
 - **Avisa só o que mudou:** quando cai, quando volta e um lembrete a cada 3 h se continuar fora.

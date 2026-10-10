@@ -101,6 +101,24 @@ if (horaBrasilia(agora) >= HORA_BOM_DIA && estado.bomDia !== hoje) {
   estado.bomDia = hoje;
 }
 
+// 3b) Manychato: muita gente mandando a mesma palavra sem receber a automação (ou DMs falhando).
+//     O Manychato decide o que avisar e não repete o mesmo alerta por 6 h.
+if (env.MANYCHATO_ALERTS_SECRET) {
+  try {
+    const r = await fetch('https://manychato.jeldebeloni.com.br/api/scheduled/automation-alerts', {
+      headers: { authorization: `Bearer ${env.MANYCHATO_ALERTS_SECRET}` },
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!r.ok) throw new Error(`respondeu ${r.status}`);
+    const { alerts = [] } = await r.json();
+    for (const a of alerts) mensagens.push([a.titulo, a.detalhe]);
+    console.log(`Alertas do Manychato: ${alerts.length}`);
+  } catch (e) {
+    // Manychato fora do ar já é avisado pela conferência dos sites; aqui só registra.
+    console.warn('Alertas do Manychato não consultados:', e.message);
+  }
+}
+
 // 4) Envia (inclusive avisos que falharam antes) e guarda o estado.
 const fila = [...estado.pendentes, ...mensagens.map((m) => ({ m, tentativas: 0 }))];
 estado.pendentes = [];

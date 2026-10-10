@@ -119,6 +119,22 @@ if (env.MANYCHATO_ALERTS_SECRET) {
   }
 }
 
+// 3c) Manychato: reenvia as DMs que a Meta barrou por limite (fila de reenvio).
+if (env.MANYCHATO_ALERTS_SECRET) {
+  try {
+    const r = await fetch('https://manychato.jeldebeloni.com.br/api/scheduled/retry-queue', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${env.MANYCHATO_ALERTS_SECRET}` },
+      signal: AbortSignal.timeout(50_000),
+    });
+    if (!r.ok) throw new Error(`respondeu ${r.status}`);
+    const f = await r.json();
+    console.log(`Fila de reenvio do Manychato: ${f.processed} itens, ${f.succeeded} enviados, ${f.requeued} para depois, ${f.failed} desistidos`);
+  } catch (e) {
+    console.warn('Fila de reenvio do Manychato não processada:', e.message);
+  }
+}
+
 // 4) Envia (inclusive avisos que falharam antes) e guarda o estado.
 const fila = [...estado.pendentes, ...mensagens.map((m) => ({ m, tentativas: 0 }))];
 estado.pendentes = [];

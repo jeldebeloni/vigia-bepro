@@ -1,4 +1,4 @@
-// Vigia BePro: confere se cada plataforma está no ar e avisa no Telegram e no WhatsApp
+// Vigia BePro: confere se cada plataforma está no ar e avisa por e-mail
 // quando alguma cai ou volta. Roda no GitHub Actions a cada 5 minutos.
 import { readFile, writeFile } from 'node:fs/promises';
 import { enviarAviso, canaisConfigurados } from './avisos.mjs';

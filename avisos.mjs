@@ -1,12 +1,11 @@
-// Manda o aviso por todos os canais configurados (Telegram e WhatsApp).
-// Basta um canal entregar; só dá erro se todos falharem.
-import { enviarWhatsApp } from './whatsapp.mjs';
+// Manda o aviso por e-mail (Gmail com senha de app) para jelde@timebeloni.com.
+// Decisão do Jelde (20/10/2026): só e-mail; WhatsApp e Telegram desligados.
+import { spawnSync } from 'node:child_process';
+
+const DESTINO = 'jelde@timebeloni.com';
 
 export function canaisConfigurados(env = process.env) {
-  const canais = [];
-  if (env.TELEGRAM_TOKEN && env.TELEGRAM_CHAT_ID) canais.push('Telegram');
-  if (env.WHATSAPP_TOKEN && env.WHATSAPP_PHONE_ID && env.WHATSAPP_DESTINO) canais.push('WhatsApp');
-  return canais;
+  return env.GMAIL_USUARIO && env.GMAIL_SENHA_APP ? ['E-mail'] : [];
 }
 
 export async function enviarAviso(mensagem, env = process.env) {
@@ -14,23 +13,28 @@ export async function enviarAviso(mensagem, env = process.env) {
     console.log('[simulação]', mensagem.join(' — '));
     return;
   }
-  const canais = canaisConfigurados(env);
-  if (!canais.length) throw new Error('nenhum canal de aviso configurado no cofre do GitHub');
-  const envios = { Telegram: enviarTelegram, WhatsApp: enviarWhatsApp };
-  const resultados = await Promise.allSettled(canais.map((c) => envios[c](mensagem, env)));
-  const falhas = resultados
-    .map((r, i) => (r.status === 'rejected' ? `${canais[i]}: ${r.reason.message}` : null))
-    .filter(Boolean);
-  for (const f of falhas) console.warn('Canal falhou —', f);
-  if (falhas.length === canais.length) throw new Error(falhas.join(' | '));
+  if (!canaisConfigurados(env).length) throw new Error('GMAIL_USUARIO e GMAIL_SENHA_APP faltam no cofre do GitHub');
+  enviarEmail(mensagem, env);
 }
 
-async function enviarTelegram([titulo, detalhe], env) {
-  const r = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text: `${titulo}\n\n${detalhe}` }),
-    signal: AbortSignal.timeout(15_000),
+// O runner do GitHub já tem Python; o smtplib evita instalar pacote no Node.
+function enviarEmail([titulo, detalhe], env) {
+  const script = `
+import os, smtplib
+from email.mime.text import MIMEText
+from email.utils import formataddr
+msg = MIMEText(os.environ['CORPO'], 'plain', 'utf-8')
+msg['Subject'] = os.environ['ASSUNTO']
+msg['From'] = formataddr(('Vigia BePro', os.environ['GMAIL_USUARIO']))
+msg['To'] = os.environ['DESTINO']
+with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) as s:
+    s.login(os.environ['GMAIL_USUARIO'], os.environ['GMAIL_SENHA_APP'])
+    s.sendmail(os.environ['GMAIL_USUARIO'], [os.environ['DESTINO']], msg.as_string())
+`;
+  const r = spawnSync('python3', ['-c', script], {
+    env: { ...env, DESTINO, ASSUNTO: `Vigia BePro: ${titulo}`, CORPO: `${titulo}\n\n${detalhe}\n\nMensagem automática do vigia das plataformas.` },
+    encoding: 'utf8',
+    timeout: 45_000,
   });
-  if (!r.ok) throw new Error(`Telegram respondeu ${r.status}: ${(await r.text()).slice(0, 200)}`);
+  if (r.status !== 0) throw new Error(`E-mail não saiu: ${(r.stderr || r.error?.message || '').trim().split('\n').pop()}`);
 }

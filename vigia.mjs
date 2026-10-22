@@ -102,7 +102,8 @@ if (horaBrasilia(agora) >= HORA_BOM_DIA && estado.bomDia !== hoje) {
 }
 
 // 3b) Manychato: muita gente mandando a mesma palavra sem receber a automação (ou DMs falhando).
-//     O Manychato decide o que avisar e não repete o mesmo alerta por 6 h.
+//     O Manychato decide o que avisar (cada palavra no máximo 1 vez por dia).
+//     Vários alertas na mesma rodada saem num e-mail só (22/10/2026: eram 8 e-mails de uma vez).
 if (env.MANYCHATO_ALERTS_SECRET) {
   try {
     const r = await fetch('https://manychato.jeldebeloni.com.br/api/scheduled/automation-alerts', {
@@ -111,7 +112,13 @@ if (env.MANYCHATO_ALERTS_SECRET) {
     });
     if (!r.ok) throw new Error(`respondeu ${r.status}`);
     const { alerts = [] } = await r.json();
-    for (const a of alerts) mensagens.push([a.titulo, a.detalhe]);
+    if (alerts.length === 1) mensagens.push([alerts[0].titulo, alerts[0].detalhe]);
+    else if (alerts.length > 1) {
+      mensagens.push([
+        `⚠️ Manychato: ${alerts.length} avisos`,
+        alerts.map((a) => `${a.titulo}\n${a.detalhe}`).join('\n\n— — —\n\n'),
+      ]);
+    }
     console.log(`Alertas do Manychato: ${alerts.length}`);
   } catch (e) {
     // Manychato fora do ar já é avisado pela conferência dos sites; aqui só registra.

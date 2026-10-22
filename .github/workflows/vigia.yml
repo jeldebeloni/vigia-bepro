@@ -1,8 +1,11 @@
 name: Vigia
 
+# O agendamento do GitHub atrasa horas (22/10/2026: rodou a cada 3 a 6 h, não a cada 5 min).
+# Por isso cada rodada vigia em ciclo por ~5h40, conferindo a cada 5 min, e no fim
+# chama a próxima. O agendamento de hora em hora só religa a corrente se ela quebrar.
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       teste:
@@ -12,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: vigia
@@ -20,7 +24,7 @@ concurrency:
 jobs:
   vigiar:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
 
@@ -28,8 +32,26 @@ jobs:
         with:
           node-version: 22
 
-      - name: Conferir plataformas
-        run: node vigia.mjs
+      - name: Conferir plataformas a cada 5 minutos
+        run: |
+          git config user.name 'vigia-bepro'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          guardar_estado() {
+            git diff --quiet estado.json && return 0
+            git commit -q -m 'Atualiza estado do vigia' estado.json
+            git pull --rebase --quiet && git push --quiet || echo '::warning::Estado não foi salvo nesta rodada'
+          }
+          if [ "$TESTE" = '1' ]; then node vigia.mjs; exit $?; fi
+          fim=$((SECONDS + 340 * 60))
+          while :; do
+            inicio=$SECONDS
+            # Rodada que falha (aviso não saiu) encerra o ciclo: o GitHub manda o e-mail de erro dele.
+            node vigia.mjs || { guardar_estado; exit 1; }
+            guardar_estado
+            [ $SECONDS -ge $fim ] && break
+            espera=$((300 - (SECONDS - inicio)))
+            [ $espera -gt 0 ] && sleep $espera
+          done
         env:
           GMAIL_USUARIO: ${{ secrets.GMAIL_USUARIO }}
           GMAIL_SENHA_APP: ${{ secrets.GMAIL_SENHA_APP }}
@@ -38,12 +60,8 @@ jobs:
           VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
           MANYCHATO_ALERTS_SECRET: ${{ secrets.MANYCHATO_ALERTS_SECRET }}
 
-      - name: Guardar estado
-        if: always()
-        run: |
-          git diff --quiet estado.json && exit 0
-          git config user.name 'vigia-bepro'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Atualiza estado do vigia' estado.json
-          git pull --rebase --quiet
-          git push --quiet
+      - name: Chamar o próximo ciclo
+        if: ${{ !cancelled() && !inputs.teste }}
+        run: gh workflow run vigia.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

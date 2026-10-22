@@ -35,4 +35,8 @@ Serve só para as plataformas da Vercel. Não resolve quando a culpa é do forne
 SIMULAR=1 node vigia.mjs
 ```
 
+## Como ele roda a cada 5 minutos
+
+O agendamento do GitHub atrasa horas (22/10/2026: rodou a cada 3 a 6 h e não avisou a queda das DMs do Manychato). Por isso cada rodada fica ~5h40 em ciclo, conferindo a cada 5 min, e no fim chama a próxima (`gh workflow run`). O agendamento de hora em hora (minuto 17) só religa a corrente se ela quebrar. Para parar de vez: cancelar a rodada em andamento não religa; desligue o workflow em Actions → Vigia → "Disable workflow".
+
 Este repositório é público para o GitHub rodar de graça a cada 5 minutos. Senhas e tokens ficam só no cofre e nunca vão para os arquivos.

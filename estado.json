@@ -1,5 +1,12 @@
 {
-  "sites": {},
+  "sites": {
+    "catalogo": {
+      "ok": false,
+      "desde": 1793081287255,
+      "motivo": "não respondeu em 40 s",
+      "avisadoEm": 1793081287255
+    }
+  },
   "pendentes": [],
   "bomDia": "2026-10-26"
 }

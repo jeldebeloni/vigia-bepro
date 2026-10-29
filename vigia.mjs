@@ -142,6 +142,23 @@ if (env.MANYCHATO_ALERTS_SECRET) {
   }
 }
 
+// 3d) Compras da loja física: robô do Tiny parado ou pedido parado no carrinho (29/10/2026).
+//     A plataforma decide o que avisar (cada tipo no máximo 1 vez por dia, das 8h às 20h).
+if (env.COMPRAS_ALERTAS_SECRET) {
+  try {
+    const r = await fetch('https://belonistore-compras.vercel.app/api/alertas', {
+      headers: { authorization: `Bearer ${env.COMPRAS_ALERTAS_SECRET}` },
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!r.ok) throw new Error(`respondeu ${r.status}`);
+    const { alerts = [] } = await r.json();
+    for (const a of alerts) mensagens.push([a.titulo, a.detalhe]);
+    console.log(`Alertas de compras: ${alerts.length}`);
+  } catch (e) {
+    console.warn('Alertas de compras não consultados:', e.message);
+  }
+}
+
 // 4) Envia (inclusive avisos que falharam antes) e guarda o estado.
 const fila = [...estado.pendentes, ...mensagens.map((m) => ({ m, tentativas: 0 }))];
 estado.pendentes = [];

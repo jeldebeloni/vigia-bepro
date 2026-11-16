@@ -49,3 +49,6 @@ Aprovado e feito em 16/11/2026.
 - Banco do Manychato: só entraram o segredo `vigia_despertador_secret` e a tarefa `vigia-bepro` (id 2). A tarefa `manychato-retry-queue` e o segredo dela ficaram iguais.
 - Revisão: o Codex estava sem limite de uso; um revisor independente leu as 2 mudanças. Corrigido: salvar o estado com 3 tentativas e rodada vermelha se falhar; comparação de chave em tempo constante. Fica aberto: o despertador não avisa sozinho se a Vercel devolver erro (o sinal é o "bom dia" faltar).
 - Pendente: a chave `GITHUB_DISPARO` não alcança `vigia-bepro` (GitHub 403). Até o Jelde incluir o repositório nela, só a reserva do GitHub acorda o Vigia.
+- 16/11 15h37: chave `GITHUB_DISPARO` liberada pelo Jelde. Desde então, uma rodada a cada 15 min, todas verdes (conferido às 16h).
+- Revisão do Codex (16/11, `codex review --commit 5e45682`): 1 ponto. "Tirar o ciclo contínuo antes do despertador funcionar deixa o Vigia só com a reserva do GitHub." Já resolvido pela chave liberada às 15h37; nada a corrigir no código.
+- Pendente: conferência de 24 h em 17/11 depois das 15h40 (90 rodadas ou mais, nenhum buraco de mais de 30 min, bom dia às 8h).

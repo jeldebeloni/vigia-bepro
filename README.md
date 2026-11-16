@@ -1,6 +1,6 @@
 # Vigia BePro
 
-Confere a cada 5 minutos se as plataformas estão no ar e avisa por e-mail (jelde@timebeloni.com) quando alguma cai ou volta.
+Confere a cada 15 minutos se as plataformas estão no ar e avisa por e-mail (jelde@timebeloni.com) quando alguma cai ou volta.
 
 ## O que ele faz
 
@@ -35,8 +35,10 @@ Serve só para as plataformas da Vercel. Não resolve quando a culpa é do forne
 SIMULAR=1 node vigia.mjs
 ```
 
-## Como ele roda a cada 5 minutos
+## Como ele roda a cada 15 minutos
 
-O agendamento do GitHub atrasa horas (22/10/2026: rodou a cada 3 a 6 h e não avisou a queda das DMs do Manychato). Por isso cada rodada fica ~5h40 em ciclo, conferindo a cada 5 min, e no fim chama a próxima (`gh workflow run`). O agendamento de hora em hora (minuto 17) só religa a corrente se ela quebrar. Para parar de vez: cancelar a rodada em andamento não religa; desligue o workflow em Actions → Vigia → "Disable workflow".
+Desde 16/11/2026 cada rodada confere tudo uma vez e termina (~1 min). Quem acorda o Vigia é o `pg_cron` do banco do Manychato (tarefa `vigia-bepro`), que a cada 15 min chama o despertador da Vercel (`processos-br`, `/api/disparar/vigia`, chave `VIGIA_SECRET`). O agendamento do próprio GitHub (minutos 7, 22, 37 e 52) fica de reserva, porque ele atrasa e pula disparos (09 a 16/11: só 26 de 168). Antes disso, cada rodada ficava ~5h40 em ciclo; ver `docs/planos/2026-11-16-rodadas-curtas.md`.
 
-Este repositório é público para o GitHub rodar de graça a cada 5 minutos. Senhas e tokens ficam só no cofre e nunca vão para os arquivos.
+Para parar de vez: Actions → Vigia → "Disable workflow" e, no Supabase do Manychato, `select cron.unschedule('vigia-bepro');`.
+
+Este repositório é público para o GitHub Actions rodar de graça e sem limite de minutos. Senhas e tokens ficam só no cofre e nunca vão para os arquivos.

@@ -42,4 +42,10 @@
 
 ## 7. Situação
 
-Aguardando ok do Jelde (16/11/2026).
+Aprovado e feito em 16/11/2026.
+
+- Vigia em rodada única no ar: rodada manual levou 21 s, 8 de 8 pontos OK. Ciclo de 5h40 cancelado.
+- Despertador da Vercel com o robô `vigia` e chave própria `VIGIA_SECRET` publicado (a chave do vigia não acorda outro robô: testado, 401).
+- Banco do Manychato: só entraram o segredo `vigia_despertador_secret` e a tarefa `vigia-bepro` (id 2). A tarefa `manychato-retry-queue` e o segredo dela ficaram iguais.
+- Revisão: o Codex estava sem limite de uso; um revisor independente leu as 2 mudanças. Corrigido: salvar o estado com 3 tentativas e rodada vermelha se falhar; comparação de chave em tempo constante. Fica aberto: o despertador não avisa sozinho se a Vercel devolver erro (o sinal é o "bom dia" faltar).
+- Pendente: a chave `GITHUB_DISPARO` não alcança `vigia-bepro` (GitHub 403). Até o Jelde incluir o repositório nela, só a reserva do GitHub acorda o Vigia.

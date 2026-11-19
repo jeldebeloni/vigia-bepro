@@ -2,6 +2,7 @@
 // quando alguma cai ou volta. Roda no GitHub Actions a cada 15 minutos.
 import { readFile, writeFile } from 'node:fs/promises';
 import { enviarAviso, canaisConfigurados } from './avisos.mjs';
+import { avaliarBackupMac, URL_BATIMENTO } from './backup-mac.mjs';
 
 const SITES = JSON.parse(await readFile(new URL('./sites.json', import.meta.url), 'utf8'));
 const ARQ_ESTADO = new URL('./estado.json', import.meta.url);
@@ -157,6 +158,20 @@ if (env.COMPRAS_ALERTAS_SECRET) {
   } catch (e) {
     console.warn('Alertas de compras não consultados:', e.message);
   }
+}
+
+// 3e) Backup do Mac (19/11/2026): sem sinal ou sem cópia completa do cofre há mais de 48 h.
+try {
+  const r = await fetch(`${URL_BATIMENTO}?t=${agora}`, { signal: AbortSignal.timeout(15_000) });
+  if (r.status !== 404 && !r.ok) throw new Error(`respondeu ${r.status}`);
+  const dados = r.status === 404 ? null : await r.json();
+  const { mensagem, estado: novo } = avaliarBackupMac(dados, estado.backupMac ?? {}, agora, duracao);
+  estado.backupMac = novo;
+  if (mensagem) mensagens.push(mensagem);
+  console.log(`Backup do Mac: último cofre completo ${novo.ultimoCompleto ?? 'sem registro'}`);
+} catch (e) {
+  // Sem ler o sinal não dá para concluir nada; o próximo ciclo tenta de novo.
+  console.warn('Sinal do backup do Mac não lido:', e.message);
 }
 
 // 4) Envia (inclusive avisos que falharam antes) e guarda o estado.

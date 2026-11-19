@@ -5,8 +5,21 @@ import { avaliarBackupMac, LIMITE_MS } from './backup-mac.mjs';
 const agora = Date.parse('2026-11-20T12:00:00Z');
 const ha = (h) => new Date(agora - h * 3_600_000).toISOString();
 
-test('sem arquivo e nunca visto: não avisa', () => {
-  assert.equal(avaliarBackupMac(null, {}, agora).mensagem, null);
+test('sem arquivo e nunca visto: espera 48 h, depois cobra o primeiro sinal', () => {
+  const r1 = avaliarBackupMac(null, {}, agora);
+  assert.equal(r1.mensagem, null);
+  assert.equal(r1.estado.monitoradoDesde, agora);
+  assert.equal(avaliarBackupMac(null, r1.estado, agora + 47 * 3_600_000).mensagem, null);
+  const r2 = avaliarBackupMac(null, r1.estado, agora + 49 * 3_600_000);
+  assert.match(r2.mensagem[1], /nunca recebeu/);
+  assert.equal(avaliarBackupMac(null, r2.estado, agora + 50 * 3_600_000).mensagem, null);
+});
+
+test('leitura falhando: só avisa quando o último sinal guardado passou de 48 h', () => {
+  const visto = { visto: true, ultimoSinal: ha(10), ultimoCompleto: ha(10), monitoradoDesde: agora - 9e8 };
+  assert.equal(avaliarBackupMac(null, visto, agora, undefined, { leituraFalhou: true }).mensagem, null);
+  const velho = { ...visto, ultimoSinal: ha(49), ultimoCompleto: ha(49) };
+  assert.match(avaliarBackupMac(null, velho, agora, undefined, { leituraFalhou: true }).mensagem[1], /Não consegui confirmar/);
 });
 
 test('sinal recente e cofre completo: não avisa', () => {

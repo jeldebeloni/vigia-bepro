@@ -170,8 +170,11 @@ try {
   if (mensagem) mensagens.push(mensagem);
   console.log(`Backup do Mac: último cofre completo ${novo.ultimoCompleto ?? 'sem registro'}`);
 } catch (e) {
-  // Sem ler o sinal não dá para concluir nada; o próximo ciclo tenta de novo.
+  // Leitura falhou: avalia pelo último sinal guardado (avisa só se ele já passou de 48 h).
   console.warn('Sinal do backup do Mac não lido:', e.message);
+  const { mensagem, estado: novo } = avaliarBackupMac(null, estado.backupMac ?? {}, agora, duracao, { leituraFalhou: true });
+  estado.backupMac = novo;
+  if (mensagem) mensagens.push(mensagem);
 }
 
 // 4) Envia (inclusive avisos que falharam antes) e guarda o estado.

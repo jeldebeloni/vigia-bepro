@@ -15,7 +15,6 @@ const FORNECEDORES = {
 
 const ESPERA_RECONFERIR_MS = 30_000; // confirma a queda antes de avisar
 const LEMBRETE_MS = 3 * 60 * 60 * 1000; // relembra a cada 3 h se continuar fora
-const HORA_BOM_DIA = 8; // mensagem diária "vigia ativo", horário de Brasília
 const MAX_TENTATIVAS_ENVIO = 3;
 
 const env = process.env;
@@ -88,19 +87,7 @@ if (voltou.length) {
   ]);
 }
 
-// 3) Uma vez por dia, depois das 8 h: prova de que o vigia está vivo.
-const hoje = dataBrasilia(agora);
-if (horaBrasilia(agora) >= HORA_BOM_DIA && estado.bomDia !== hoje) {
-  const fora = resultados.filter(([, r]) => !r.ok).map(([s]) => s.nome);
-  const total = resultados.length;
-  mensagens.push([
-    '✅ Vigia ativo',
-    fora.length
-      ? `${total - fora.length} de ${total} plataformas no ar às ${hora(agora)}. Fora: ${fora.join(', ')}.`
-      : `${total} de ${total} plataformas no ar às ${hora(agora)}. Se esta mensagem não chegar amanhã, o vigia parou.`,
-  ]);
-  estado.bomDia = hoje;
-}
+// 3) Sem e-mail diário de "vigia ativo" (pedido do Jelde, 24/11/2026): só avisa quando algo cai.
 
 // 3b) Manychato: muita gente mandando a mesma palavra sem receber a automação (ou DMs falhando).
 //     O Manychato decide o que avisar (cada palavra no máximo 1 vez por dia).
@@ -303,14 +290,6 @@ async function lerEstado() {
 
 function hora(ms) {
   return new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }).format(ms);
-}
-
-function horaBrasilia(ms) {
-  return Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hourCycle: 'h23' }).format(ms));
-}
-
-function dataBrasilia(ms) {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(ms);
 }
 
 function duracao(ms) {

@@ -8,7 +8,7 @@ Confere a cada 15 minutos se as plataformas estão no ar e avisa por e-mail (jel
 - **Confirma antes de avisar:** só avisa se a queda se repetir 30 segundos depois.
 - **Diz de quem é a culpa:** lê a página de status da Vercel, do Supabase ou da Nuvemshop. Também diz quando foi a última publicação.
 - **Avisa só o que mudou:** quando cai, quando volta e um lembrete a cada 3 h se continuar fora.
-- **Bom dia diário:** às 8 h manda "Vigia ativo". Se essa mensagem não chegar, o vigia parou.
+- **Sem e-mail diário** (24/11/2026): só manda e-mail quando algo cai, volta ou continua fora. Se o vigia parar, o GitHub manda o e-mail de erro.
 - **Backup do Mac (19/11/2026):** lê o `backup-mac.json` do ramo `batimento-mac`, que o Mac grava a cada 12 h (só horários e estados). Se passar de 48 h sem sinal ou sem cópia completa do cofre, avisa; lembra a cada 24 h e avisa quando volta. Código em `backup-mac.mjs`, teste em `backup-mac.test.mjs` (`node --test`).
 - **Só e-mail (20/10/2026):** sai do Gmail jeldepessoal@gmail.com para jelde@timebeloni.com. Se o e-mail falhar, a rodada falha e o GitHub manda o e-mail de erro dele.
 

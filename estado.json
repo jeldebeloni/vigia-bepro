@@ -4,10 +4,7 @@
       "ok": true
     },
     "manychato": {
-      "ok": false,
-      "desde": 1795635008074,
-      "motivo": "abriu, mas com conteúdo diferente do esperado",
-      "avisadoEm": 1795635008074
+      "ok": true
     }
   },
   "pendentes": [],
